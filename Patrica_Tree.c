@@ -22,6 +22,21 @@ void inicializaNo(No **arvore){ //Criação de um Dummy
     (*arvore)->bit = -1;
 }
 
+No *busca_rec(No *arvore, unsigned chave, int w){
+    if(arvore->bit <= w){
+        return arvore;
+    }if(bit(chave, arvore->bit) == 0){
+        return busca_rec(arvore->esq, chave, arvore->bit);
+    }else{
+        return busca_rec(arvore->dir, chave, arvore->bit);
+    }
+}
+
+No *busca(No *arvore, unsigned chave){
+    No *t = busca_rec(arvore, chave, -1);
+    return t->chave == chave ? t : NULL;
+}
+
 int comprimento(char *palavra){
     int i = 0;
     while(palavra[i] != '\0'){
