@@ -76,3 +76,4 @@ void insere(No **arvore, unsigned chave){
         (*arvore)->esq = insere_rec((*arvore)->esq, chave, i, *arvore);
     }
 }
+
