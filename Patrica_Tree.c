@@ -137,16 +137,15 @@ No* remove_rec(No* arvore, unsigned chave, No* pai) {
 
     //Removendo a chave e ajustando a árvore
     if (arvore == arvore->esq && arvore == arvore->dir) {
-        //Se o Nó é folha, pode ser removido diretamente
-        free(arvore);
+        free(arvore); //Se o Nó é folha, pode ser removido diretamente  
         return NULL;
     }
 
     //Substituir o nó removido
     if (arvore->esq == arvore) {
-        return arvore->dir;  //Retorna o filho direito
+        return arvore->dir; //Retorna o filho direito
     } else {
-        return arvore->esq;  //Retorna o filho esquerdo
+        return arvore->esq; //Retorna o filho esquerdo
     }
 }
 
@@ -168,4 +167,41 @@ void remover(No** arvore, unsigned chave) {
     } else {
         printf("Chave %u removida com sucesso.\n", chave);
     }
+}
+
+///////////////////////////////////////////////////////////////////////
+//A PARTIR DAQUI TEMOS AS FUNÇÕES DE IMPRESSÃO UTILIZADAS NO TRABALHO//
+///////////////////////////////////////////////////////////////////////
+
+//FUNÇÃO DE IDENTAÇÃO, UTILIZADA PARA ORGANIZAR A ÁRVORE DE MANEIRA HIERÁRQUICA NA TELA
+void imprime_espacos(int nivel) {
+    for (int i = 0; i < nivel; i++) {
+        printf("  ");
+    }
+}
+
+//FUNÇÃO RECURSIVA QUE PERCORRE A ÁRVORE. IMPRIME A CHAVE E O BIT ATUAL DO NÓ FAZENDO CHAMADAS RECURSIVAS. "NIVEL" É UTILIZADO PARA CONTROLAR IDENTAÇÃO
+void imprime_rec(No *arvore, int nivel) {
+    //Caso de um nó nulo | árvore ou subárvore vazia
+    if (arvore == NULL || arvore->chave == UINT_MAX) {
+        return;
+    }
+
+    imprime_espacos(nivel); //Imprime espaços com base no nível da árvore
+    printf("Nó: Chave = %u, Bit = %d\n", arvore->chave, arvore->bit); //Imprime a chave e o bit do nó
+
+    //Recursão para os filhos
+    imprime_espacos(nivel);
+    printf("Esquerda:\n");
+    imprime_rec(arvore->esq, nivel + 1);
+
+    imprime_espacos(nivel);
+    printf("Direita:\n");
+    imprime_rec(arvore->dir, nivel + 1);
+}
+
+//FUNÇÃO DE IMPRESSÃO PRINCIPAL
+void imprime_arvore(No *arvore) {
+    printf("Imprimindo a árvore Patricia:\n");
+    imprime_rec(arvore, 0);  //Começa a impressão no nível 0
 }
