@@ -92,10 +92,10 @@ No *insere_rec(No *arvore, char chave, int w, No *pai){
         return novo;
     }
     
-    //Se o bit da chave for 0
+    //Vai buscar o lugar pra inserir o nó
     if(bit(chave, arvore->bit) == 0)
         arvore->esq = insere_rec(arvore->esq, chave, w, arvore);
-    else //Se o bit da chave for 1
+    else
         arvore->dir = insere_rec(arvore->dir, chave, w, arvore);
     return arvore;
 }
@@ -149,6 +149,7 @@ No* remove_rec(No* arvore, char chave, No* pai) {
     }
 
     //Substituir o nó removido
+    //Este trecho de código decide qual filho do nó atual deve substituí-lo após a remoção
     if (arvore->esq == arvore) {
         return arvore->dir; //Retorna o filho direito
     } else {
@@ -158,7 +159,7 @@ No* remove_rec(No* arvore, char chave, No* pai) {
 
 //FUNÇÃO QUE REALMENTE REALIZA A REMOÇÃO UTILIZANDO AS DUAS ULTIMAS FUNÇÕES AUXILIARES
 void remover(No** arvore, char chave) {
-    No* pai = busca_pai_rec(*arvore, chave, NULL, -1);
+    No* pai = busca_pai_rec(*arvore, chave, NULL, -1); //Cria um nó pai para armazenar o resultado da busca
     if (pai == NULL) {
         printf("Chave %u não encontrada.\n", chave);
         return;
@@ -166,7 +167,7 @@ void remover(No** arvore, char chave) {
     
     No* removido = remove_rec(*arvore, chave, pai);
     if (removido != NULL) {
-        if (pai->esq == removido) {
+        if (pai->esq == removido) { //Vai perder o ponteiro aq???? (Junim??)
             pai->esq = removido;
         } else {
             pai->dir = removido;
@@ -188,7 +189,7 @@ void imprime_espacos(int nivel) {
 }
 
 //FUNÇÃO RECURSIVA QUE PERCORRE A ÁRVORE. IMPRIME A CHAVE E O BIT ATUAL DO NÓ FAZENDO CHAMADAS RECURSIVAS. "NIVEL" É UTILIZADO PARA CONTROLAR IDENTAÇÃO
-void imprime_rec(No *arvore, int nivel) {
+void imprime_rec(No *arvore, int nivel) { //O nível é utilizado para controlar a identação, ou seja, a quantidade de espaços que serão impressos antes de cada nó
     //Caso de um nó nulo | árvore ou subárvore vazia
     if (arvore == NULL || arvore->chave == UINT_MAX) {
         return;
