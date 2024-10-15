@@ -48,7 +48,7 @@ void inicializaNo(No **arvore){ //Criação de um Dummy
 
 //FUNÇÃO QUE BUSCA UMA CHAVE NA ÁRVORE, UTILIADA DE FORMA RECURSIVA
 //PECORRE A ÁRVORE COMPARANDO OS BITS DA CHAVE ATÉ ENCONTRAR O NÓ CORRESPONDETE OU NÓ COM BIT MENOR QUE W
-No *busca_rec(No *arvore, unsigned char chave, int w){
+No *busca_rec(No *arvore, unsigned char *chave, int w){
     if(arvore->bit <= w){ //Se o bit do nó for menor ou igual a w
         return arvore;
     }if(bit(chave, arvore->bit) == 0){ //Se o bit da chave for 0
@@ -59,20 +59,11 @@ No *busca_rec(No *arvore, unsigned char chave, int w){
 }
 
 //FUNÇÃO QUE UTILIZA DE FORMA ADEQUADA A "BUSCA_REC" PARA ENCONTRAR O NÓ COM A CHAVE PROCURADA
-No *busca(No *arvore, unsigned char chave){
+No *busca(No *arvore, unsigned char *chave){
     No *t = busca_rec(arvore, chave, -1); //Cria um No temp para armazenar o resultado da busca
     return t->chave == chave ? t : NULL; //Se a chave não for encontrada retorna NULL
 }
 
-//FUNÇÃO PARA MEDIR O COMPRIMENTO DA CHAVE INDICADA, É UMA FUNÇÃO AUXILIAR QUE AINDA NÃO DECIDIMOS COMO UTILIZAR AO CERTO
-//POR ENQUANTO FICA AQUI EM STAND-BY
-int comprimento(unsigned char *palavra){
-    int i = 0;
-    while(palavra[i] != '\0'){
-        i++;
-    }
-    return i;
-}
 //////////////////////////////////////////////////////////////////////
 //A PARTIR DAQUI TEMOS AS FUNÇÕES DE INSERÇÃO UTILIZADAS NO TRABALHO//
 //////////////////////////////////////////////////////////////////////
@@ -80,15 +71,19 @@ int comprimento(unsigned char *palavra){
 //FUNÇÃO PARA INSERIR UMA NOVA CHAVE NA ÁRVORE, CRIA UM NOVO NÓ QUANDO NECESSÁRIO
 //ELA INSERE A CHAVE NA ÁRVORE QUANDO ENCONTRA O BIT CORRETO ONDE DIVERGE DE OUTRAS CHAVES
 //É A FUNÇÃO COM A LÓGICA PRINCIPAL PARA REALIZAR A INSERÇÃO
-No *insere_rec(No *arvore, unsigned char chave, int w, No *pai){
+No *insere_rec(No *arvore, unsigned char *chave, int w, No *pai){
     No *novo;
 
     //Utiliza o W para encontrar o bit correto para inserir a chave
     if ((arvore->bit >= w) || (arvore->bit <= pai->bit)){  //Tradução: Se o bit do nó for maior ou igual a w ou o bit do nó for menor ou igual ao bit do pai
         //Criação do nó
         novo = malloc(sizeof(No)); 
-        novo->chave = chave;
+        novo->chave = malloc(strlen(chave) + 1); //Alocando espaço para a chave no nó novo, como é um vetor de char, é necessário alocar espaço para o '\0'
         novo->bit = w;
+        
+        //mudanças aplicadas visto que estamos utilizando ponteiro de char para chave (ali em cima tbm foi alterado)
+        strcpy(novo->chave, chave); //Copia a chave para o nó novo
+        novo->bit = w; //Atribui o bit w ao nó novo
 
         //Utilizando o nó novo para inserir a chave na árvore
         if(bit(chave, novo->bit) == 1){ //Se o bit da chave for 1
@@ -111,14 +106,22 @@ No *insere_rec(No *arvore, unsigned char chave, int w, No *pai){
 
 //FUNÇÃO PARA CHAMAR E UTILIZAR DE FORMA CORRETA A "INSERE_REC"
 //UTILIZAMOS UM LOOP DE FOR PARA ENCONTRAR O PRIMEIRO BIT QUE A CHAVE DIFERE DE T E EM SEGUIDA UTILIZAMOS A INSERE_REC
-void insere(No **arvore, unsigned char chave){
-    No *t = busca_rec((*arvore)->esq, chave, -1);
-    if(chave == t->chave){
+void insere(No **arvore, unsigned char *chave) {
+    // Busca recursivamente a posição correta para a nova chave, começando pela raiz da árvore
+    No *t = busca_rec(*arvore, chave, -1);
+    
+    // Se a chave já estiver presente, não faz nada
+    if (strcmp((char *)chave, (char *)t->chave) == 0) {
         return;
     }
-    for(int i = 0; bit(chave, i) == bit(t->chave, i); i++){
-        (*arvore)->esq = insere_rec((*arvore)->esq, chave, i, *arvore);
-    }
+
+    int i; //Eu sei que isso é feio, mas pelo visto vou ter que utilizar isso pra conseguir arrumar essa função
+
+    // Encontra o primeiro bit diferente entre a nova chave e a chave do nó encontrado
+    for (i = 0; bit(chave, i) == bit(t->chave, i); i++); //Aqui é onde o loop é utilizado para encontrar o primeiro bit diferente
+    
+    // Insere recursivamente a chave na posição correta e atualiza a árvore
+    *arvore = insere_rec(*arvore, chave, i, *arvore);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -127,7 +130,7 @@ void insere(No **arvore, unsigned char chave){
 
 //FUNÇÃO QUE ENCONTRA O NÓ PAI E O NÓ A SER REMOVIDO PARA AJUSTAR CORRETAMENTE OS APONTAMENTOS
 //É UMA FUNÇÃO AUXILIAR PARA REALIZAR A REMOÇÃO DEFINITIVA
-No* busca_pai_rec(No* arvore, unsigned char chave, No* pai, int w) { //Aqui usamos como pârametro o nó pai, a chave a ser removida e o bit w
+No* busca_pai_rec(No* arvore, unsigned char *chave, No* pai, int w) { //Aqui usamos como pârametro o nó pai, a chave a ser removida e o bit w
     if (arvore->bit <= w) { //Se o bit do nó for menor ou igual ao bit w
         return pai; //Retorna o nó pai
     }
@@ -140,7 +143,7 @@ No* busca_pai_rec(No* arvore, unsigned char chave, No* pai, int w) { //Aqui usam
 
 //FUNÇÃO QUE LIDA COM A REMOÇÃO DA CHAVE DE FORMA A AJUSTAR A ÁVORE DE ACORDO COM O NECESSÁRIO
 //É A FUNÇÃO COM A LÓGICA PRINCIPAL PARA REALIZAR A REMOÇÃO
-No* remove_rec(No* arvore, unsigned char chave, No* pai) {
+No* remove_rec(No* arvore, unsigned char *chave, No* pai) {
     //Se chegarmos/voltarmos ao nó Dummy a função para
     if (arvore == pai || arvore->chave == UINT_MAX) { //Se o nó for o Dummy ou a chave for UINT_MAX
         return NULL;
@@ -167,7 +170,7 @@ No* remove_rec(No* arvore, unsigned char chave, No* pai) {
 }
 
 //FUNÇÃO QUE REALMENTE REALIZA A REMOÇÃO UTILIZANDO AS DUAS ULTIMAS FUNÇÕES AUXILIARES
-void remover(No** arvore, unsigned char chave) {
+void remover(No** arvore, unsigned char *chave) {
     No* pai = busca_pai_rec(*arvore, chave, NULL, -1); //Cria um nó pai para armazenar o resultado da busca
     if (pai == NULL) {
         printf("Chave %u não encontrada.\n", chave);
@@ -200,7 +203,7 @@ void imprime_espacos(int nivel) {
 //FUNÇÃO RECURSIVA QUE PERCORRE A ÁRVORE. IMPRIME A CHAVE E O BIT ATUAL DO NÓ FAZENDO CHAMADAS RECURSIVAS. "NIVEL" É UTILIZADO PARA CONTROLAR IDENTAÇÃO
 void imprime_rec(No *arvore, int nivel) { //O nível é utilizado para controlar a identação, ou seja, a quantidade de espaços que serão impressos antes de cada nó
     //Caso de um nó nulo | árvore ou subárvore vazia
-    if (arvore == NULL || arvore->chave == UINT_MAX) {
+    if (arvore == NULL || arvore->chave == UCHAR_MAX || arvore->chave == NULL){
         return;
     }
 
