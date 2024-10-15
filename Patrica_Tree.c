@@ -16,7 +16,7 @@
 typedef struct No{
     unsigned char *chave; //ponteiro para a chave pois faz com que vire um vetor de char
     int bit; //para saber a direção do nó
-    struct No *esq, *dir;
+    struct No *esq, *dir; //para a esquerda qnd for 1 e direita qnd for 0
 } No;
 
 //IDENTIFICAÇÃO DO K-ÉSIMO BIT PARA COMPARAÇÕES E DECISÃO DE DIREÇÕES DA ÁRVORE
@@ -49,6 +49,7 @@ void inicializaNo(No **arvore){ //Criação de um Dummy
 //FUNÇÃO QUE BUSCA UMA CHAVE NA ÁRVORE, UTILIADA DE FORMA RECURSIVA
 //PECORRE A ÁRVORE COMPARANDO OS BITS DA CHAVE ATÉ ENCONTRAR O NÓ CORRESPONDETE OU NÓ COM BIT MENOR QUE W
 No *busca_rec(No *arvore, unsigned char *chave, int w){
+
     if(arvore->bit <= w){ //Se o bit do nó for menor ou igual a w
         return arvore;
     }if(bit(chave, arvore->bit) == 0){ //Se o bit da chave for 0
@@ -59,7 +60,18 @@ No *busca_rec(No *arvore, unsigned char *chave, int w){
 }
 
 //FUNÇÃO QUE UTILIZA DE FORMA ADEQUADA A "BUSCA_REC" PARA ENCONTRAR O NÓ COM A CHAVE PROCURADA
-No *busca(No *arvore, unsigned char *chave){
+No *busca(No *arvore, unsigned char chave){
+
+    //Aqui vamos criar algumas mensagens de erros para o caso de falha nos ponteiros
+    if(arvore == NULL){
+        printf("Ponteiro da arvore = NULL na busca");
+        return NULL;
+    }
+    if(arvore->chave == NULL){
+        printf("Chave da arvore = NULL na busca");
+        return NULL;
+    }
+
     No *t = busca_rec(arvore, chave, -1); //Cria um No temp para armazenar o resultado da busca
     return t->chave == chave ? t : NULL; //Se a chave não for encontrada retorna NULL
 }
@@ -131,6 +143,7 @@ void insere(No **arvore, unsigned char *chave) {
 //FUNÇÃO QUE ENCONTRA O NÓ PAI E O NÓ A SER REMOVIDO PARA AJUSTAR CORRETAMENTE OS APONTAMENTOS
 //É UMA FUNÇÃO AUXILIAR PARA REALIZAR A REMOÇÃO DEFINITIVA
 No* busca_pai_rec(No* arvore, unsigned char *chave, No* pai, int w) { //Aqui usamos como pârametro o nó pai, a chave a ser removida e o bit w
+
     if (arvore->bit <= w) { //Se o bit do nó for menor ou igual ao bit w
         return pai; //Retorna o nó pai
     }
@@ -144,6 +157,7 @@ No* busca_pai_rec(No* arvore, unsigned char *chave, No* pai, int w) { //Aqui usa
 //FUNÇÃO QUE LIDA COM A REMOÇÃO DA CHAVE DE FORMA A AJUSTAR A ÁVORE DE ACORDO COM O NECESSÁRIO
 //É A FUNÇÃO COM A LÓGICA PRINCIPAL PARA REALIZAR A REMOÇÃO
 No* remove_rec(No* arvore, unsigned char *chave, No* pai) {
+
     //Se chegarmos/voltarmos ao nó Dummy a função para
     if (arvore == pai || arvore->chave == UINT_MAX) { //Se o nó for o Dummy ou a chave for UINT_MAX
         return NULL;
@@ -171,6 +185,7 @@ No* remove_rec(No* arvore, unsigned char *chave, No* pai) {
 
 //FUNÇÃO QUE REALMENTE REALIZA A REMOÇÃO UTILIZANDO AS DUAS ULTIMAS FUNÇÕES AUXILIARES
 void remover(No** arvore, unsigned char *chave) {
+
     No* pai = busca_pai_rec(*arvore, chave, NULL, -1); //Cria um nó pai para armazenar o resultado da busca
     if (pai == NULL) {
         printf("Chave %u não encontrada.\n", chave);
