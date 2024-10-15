@@ -21,3 +21,10 @@ Necessario:
     Projeto de Algoritmos: com implementação em Pascal e C (Ziviani) pg 189/482
     Algorithms on Strings, Trees, and Sequences (Dan Gusfield)
     Estruturas de Dados em C" por Tenembaum
+
+    Trabalho entregue 15/10/2025 às 00:20.
+
+    Todas as funções foram construidas com base nos livros descritos e também nos slides oferecidos em sala de aula.
+
+    O código foi revisado inumeras vezes e foram realizados vários testes de acordo com a main gerada para testes, de acordo com o analisado possivelmente está ocorrendo alguma perda de ponteiros durante a execução do código e não conseguimos identificar com exatidão onde isso ocorre, mesmo alterando diversas o código a fim de encontrar tais erros.
+
